@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Reviews — CTXLabz</title>
+  <meta name="description" content="See what verified researchers say about CTXLabz. Real reviews from real customers." />
+  <link rel="preconnect" href="https://utqviljholfvpfztfuvx.supabase.co" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@600;700&display=swap" onload="this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@600;700&display=swap"></noscript>
+  <link rel="modulepreload" href="js/supabase.js">
+  <link rel="modulepreload" href="js/auth.js?v=15">
+  <link rel="modulepreload" href="js/cart.js?v=19">
+  <link rel="stylesheet" href="css/site.css?v=4" />
+  <style>
+    body { display:flex; flex-direction:column; min-height:100vh; background:var(--off,#07111F); }
+
+    /* ── Page header ─────────────────────────────────────── */
+    .reviews-page-header {
+      background: var(--black,#04090F);
+      border-bottom: 1px solid var(--border,#112033);
+      padding: 52px 0 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .reviews-page-header::after {
+      content:'';
+      position:absolute;
+      bottom:0; left:0; right:0;
+      height:2px;
+      background:linear-gradient(90deg,transparent,var(--red,#CC1126),transparent);
+    }
+    .reviews-page-header .container {
+      max-width:1100px; margin:0 auto; padding:0 24px;
+    }
+    .reviews-eyebrow {
+      font-family:var(--font-c); font-size:.6rem; font-weight:700;
+      letter-spacing:.28em; text-transform:uppercase;
+      color:var(--red,#CC1126); margin-bottom:8px;
+    }
+    .reviews-page-title {
+      font-family:var(--font-d); font-size:clamp(2.2rem,5vw,3.6rem);
+      letter-spacing:.06em; color:var(--white,#EEF4FF);
+      margin:0 0 6px; line-height:1;
+    }
+    .reviews-page-sub {
+      font-family:var(--font-b); font-size:.88rem;
+      color:var(--ash,#6A8FAD); margin:0;
+    }
+    .reviews-stats {
+      display:flex; gap:28px; margin-top:20px; flex-wrap:wrap;
+    }
+    .reviews-stat {
+      display:flex; flex-direction:column; gap:3px;
+    }
+    .reviews-stat-num {
+      font-family:var(--font-d); font-size:1.8rem;
+      letter-spacing:.04em; color:var(--white,#EEF4FF); line-height:1;
+    }
+    .reviews-stat-label {
+      font-family:var(--font-c); font-size:.55rem; font-weight:700;
+      letter-spacing:.16em; text-transform:uppercase; color:var(--ash,#6A8FAD);
+    }
+
+    /* ── Filter bar ──────────────────────────────────────── */
+    .reviews-filter-bar {
+      background:var(--black,#04090F);
+      border-bottom:1px solid var(--border,#112033);
+      padding:0 24px;
+      position:sticky; top:0; z-index:50;
+    }
+    .reviews-filter-inner {
+      max-width:1100px; margin:0 auto;
+      display:flex; align-items:center; gap:4px;
+      overflow-x:auto; padding:12px 0;
+      scrollbar-width:none;
+    }
+    .reviews-filter-inner::-webkit-scrollbar { display:none; }
+    .filter-divider {
+      width:1px; height:20px;
+      background:var(--border,#112033);
+      margin:0 6px; flex-shrink:0;
+    }
+    .rf-btn {
+      font-family:var(--font-c); font-size:.6rem; font-weight:700;
+      letter-spacing:.14em; text-transform:uppercase;
+      background:none; border:1px solid var(--border,#112033);
+      color:var(--ash,#6A8FAD); padding:6px 14px; border-radius:2px;
+      cursor:pointer; white-space:nowrap; flex-shrink:0;
+      transition:color .15s, border-color .15s, background .15s;
+    }
+    .rf-btn:hover { color:var(--white,#EEF4FF); border-color:#2a3a4a; }
+    .rf-btn.active {
+      color:#fff;
+      background:#1A4FA0;
+      border-color:#1A4FA0;
+    }
+
+    /* ── Reviews grid ────────────────────────────────────── */
+    .reviews-body {
+      flex:1; padding:40px 0 72px;
+    }
+    .reviews-body .container {
+      max-width:1100px; margin:0 auto; padding:0 24px;
+    }
+    .reviews-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(300px,1fr));
+      gap:18px; align-items:start;
+    }
+
+    /* ── Unified review card ─────────────────────────────── */
+    .rc {
+      background:var(--card,#0A1829);
+      border:1px solid var(--border,#112033);
+      border-radius:4px;
+      padding:20px 20px 16px;
+      display:flex; flex-direction:column; gap:10px;
+      position:relative;
+      transition:border-color .2s, transform .2s, box-shadow .2s;
+    }
+    .rc:hover {
+      border-color:rgba(204,17,38,.35);
+      transform:translateY(-2px);
+      box-shadow:0 10px 32px rgba(0,0,0,.35);
+    }
+
+    /* Type badge — top-left corner */
+    .rc-type {
+      position:absolute; top:-1px; left:16px;
+      font-family:var(--font-c); font-size:.48rem; font-weight:700;
+      letter-spacing:.14em; text-transform:uppercase;
+      padding:2px 8px; border-radius:0 0 3px 3px;
+    }
+    .rc-type--testimonial {
+      background:rgba(204,17,38,.18); color:var(--red,#CC1126);
+      border:1px solid rgba(204,17,38,.3); border-top:none;
+    }
+    .rc-type--review {
+      background:rgba(106,143,173,.12); color:var(--ash,#6A8FAD);
+      border:1px solid rgba(106,143,173,.2); border-top:none;
+    }
+
+    /* Top row: stars left, avatar+name right */
+    .rc-top {
+      display:flex; align-items:center;
+      justify-content:space-between; gap:10px;
+      margin-top:10px;
+    }
+    .rc-stars { letter-spacing:3px; font-size:.85rem; }
+    .rc-stars-filled { color:var(--red,#CC1126); }
+    .rc-stars-empty  { color:var(--border,#112033); }
+
+    .rc-author {
+      display:flex; align-items:center; gap:7px; flex-shrink:0;
+    }
+    .rc-avatar {
+      width:24px; height:24px; border-radius:50%;
+      background:var(--red,#CC1126); color:#fff;
+      font-family:var(--font-c); font-size:.65rem; font-weight:700;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .rc-name {
+      font-family:var(--font-c); font-size:.58rem; font-weight:700;
+      letter-spacing:.1em; text-transform:uppercase; color:var(--ash,#6A8FAD);
+    }
+
+    /* Title */
+    .rc-title {
+      font-family:var(--font-c); font-size:.95rem; font-weight:700;
+      letter-spacing:.03em; color:var(--white,#EEF4FF);
+      margin:0;
+    }
+
+    /* Product tag (for reviews) */
+    .rc-product {
+      font-family:var(--font-c); font-size:.55rem; font-weight:700;
+      letter-spacing:.1em; text-transform:uppercase;
+      color:var(--ash,#6A8FAD);
+      background:rgba(17,32,51,.8);
+      border:1px solid var(--border,#112033);
+      padding:3px 8px; border-radius:2px;
+      display:inline-block; width:fit-content;
+    }
+
+    /* Body */
+    .rc-body {
+      font-family:var(--font-b); font-size:.85rem;
+      line-height:1.65; color:var(--light,#C2DAFF); margin:0; flex:1;
+    }
+
+    /* Date */
+    .rc-date {
+      font-family:var(--font-c); font-size:.52rem;
+      letter-spacing:.1em; text-transform:uppercase;
+      color:var(--border,#112033); margin-top:4px;
+    }
+
+    /* Empty/loading state */
+    .reviews-empty {
+      grid-column:1/-1; text-align:center;
+      padding:64px 0;
+      font-family:var(--font-c); font-size:.68rem; font-weight:700;
+      letter-spacing:.14em; text-transform:uppercase;
+      color:var(--ash,#6A8FAD); opacity:.5;
+    }
+  </style>
+</head>
+<body>
+<a href="#main-content" class="skip-link" style="position:absolute;top:0;left:0;padding:8px 16px;background:var(--red);color:#fff;font-family:var(--font-c);font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;z-index:999;transform:translateY(-100%);transition:transform .2s;will-change:transform" onfocus="this.style.transform='translateY(0)'" onblur="this.style.transform='translateY(-100%)'">Skip to content</a>
+
+<div id="nav-mount"></div>
+<div id="banner-mount"></div>
+
+<!-- Page header -->
+<div class="reviews-page-header" id="main-content">
+  <div class="container">
+    <div class="reviews-eyebrow">Verified Researchers</div>
+    <h1 class="reviews-page-title">Customer Reviews</h1>
+    <p class="reviews-page-sub">Real feedback from real researchers.</p>
+    <div class="reviews-stats">
+      <div class="reviews-stat">
+        <div class="reviews-stat-num" id="stat-total">—</div>
+        <div class="reviews-stat-label">Total Reviews</div>
+      </div>
+      <div class="reviews-stat">
+        <div class="reviews-stat-num" id="stat-avg">—</div>
+        <div class="reviews-stat-label">Average Rating</div>
+      </div>
+      <div class="reviews-stat">
+        <div class="reviews-stat-num" id="stat-5star">—</div>
+        <div class="reviews-stat-label">5-Star Reviews</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter bar -->
+<div class="reviews-filter-bar">
+  <div class="reviews-filter-inner">
+    <button class="rf-btn" onclick="openTestimonialPopup()" style="background:var(--red,#CC1126);color:#fff;border-color:var(--red,#CC1126)">✎ Write a Review</button>
+    <div class="filter-divider"></div>
+    <button class="rf-btn active" data-sort="highest">★ Highest</button>
+    <button class="rf-btn" data-sort="lowest">★ Lowest</button>
+    <button class="rf-btn" data-sort="newest">Most Recent</button>
+    <button class="rf-btn" data-sort="oldest">Oldest</button>
+    <div class="filter-divider"></div>
+    <button class="rf-btn" data-sort="testimonials">Testimonials</button>
+    <button class="rf-btn" data-sort="product-reviews">Product Reviews</button>
+  </div>
+</div>
+
+<!-- Reviews grid -->
+<div class="reviews-body">
+  <div class="container">
+    <div class="reviews-grid" id="reviews-grid">
+      <div class="reviews-empty">Loading reviews…</div>
+    </div>
+  </div>
+</div>
+
+<div id="footer-mount"></div>
+
+<script type="module">
+  import { supabase } from './js/supabase.js';
+  import './js/auth.js?v=15';
+  import './js/cart.js?v=19';
+
+  await window.initPage('reviews');
+
+  // ── Fetch all data ──────────────────────────────────────
+  let _all = [];  // combined array
+  let _filter = 'highest';
+
+  const [tsRes, rvRes, prRes] = await Promise.all([
+    supabase.from('testimonials').select('id,display_name,rating,title,body,created_at,approved').eq('approved', true),
+    supabase.from('reviews').select('id,user_id,product_id,stars,comment,username,updated_at'),
+    supabase.from('products').select('id,name'),
+  ]);
+
+  const productMap = {};
+  (prRes.data || []).forEach(p => { productMap[p.id] = p.name; });
+
+  const testimonials = (tsRes.data || []).map(r => ({
+    _type:   'testimonial',
+    rating:  r.rating,
+    name:    r.display_name || 'Verified Researcher',
+    title:   r.title || '',
+    body:    r.body || '',
+    product: null,
+    date:    new Date(r.created_at),
+  }));
+
+  const reviews = (rvRes.data || []).map(r => ({
+    _type:   'review',
+    rating:  r.stars,
+    name:    r.username || 'Anonymous',
+    title:   '',
+    body:    r.comment || '',
+    product: productMap[r.product_id] || null,
+    date:    new Date(r.updated_at),
+  }));
+
+  _all = [...testimonials, ...reviews];
+
+  // ── Stats ───────────────────────────────────────────────
+  if (_all.length) {
+    const avg = (_all.reduce((s, r) => s + r.rating, 0) / _all.length).toFixed(1);
+    const fiveStars = _all.filter(r => r.rating === 5).length;
+    document.getElementById('stat-total').textContent = _all.length;
+    document.getElementById('stat-avg').textContent   = avg + '★';
+    document.getElementById('stat-5star').textContent = fiveStars;
+  }
+
+  // ── Render ──────────────────────────────────────────────
+  function sorted(filter) {
+    let list = [..._all];
+    if (filter === 'testimonials')    list = list.filter(r => r._type === 'testimonial');
+    if (filter === 'product-reviews') list = list.filter(r => r._type === 'review');
+    if (filter === 'highest')  list.sort((a,b) => b.rating - a.rating);
+    if (filter === 'lowest')   list.sort((a,b) => a.rating - b.rating);
+    if (filter === 'newest')   list.sort((a,b) => b.date - a.date);
+    if (filter === 'oldest')   list.sort((a,b) => a.date - b.date);
+    // For type filters, default to highest within that type
+    if (filter === 'testimonials' || filter === 'product-reviews') {
+      list.sort((a,b) => b.rating - a.rating);
+    }
+    return list;
+  }
+
+  function render() {
+    const grid = document.getElementById('reviews-grid');
+    const list = sorted(_filter);
+
+    if (!list.length) {
+      grid.innerHTML = '<div class="reviews-empty">No reviews yet.</div>';
+      return;
+    }
+
+    grid.innerHTML = list.map(r => {
+      const filled  = '\u2605'.repeat(r.rating);
+      const empty   = '\u2606'.repeat(5 - r.rating);
+      const name    = r.name.replace(/</g, '&lt;');
+      const initial = name.charAt(0).toUpperCase();
+      const title   = r.title.replace(/</g, '&lt;');
+      const body    = r.body.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const date    = r.date.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+      const typeClass = r._type === 'testimonial' ? 'rc-type--testimonial' : 'rc-type--review';
+      const typeLabel = r._type === 'testimonial' ? 'Testimonial' : 'Product Review';
+      const product   = r.product ? '<div class="rc-product">' + r.product.replace(/</g,'&lt;') + '</div>' : '';
+
+      return '<div class="rc">'
+        + '<div class="rc-type ' + typeClass + '">' + typeLabel + '</div>'
+        + '<div class="rc-top">'
+        +   '<div class="rc-stars"><span class="rc-stars-filled">' + filled + '</span><span class="rc-stars-empty">' + empty + '</span></div>'
+        +   '<div class="rc-author"><div class="rc-avatar">' + initial + '</div><span class="rc-name">' + name + '</span></div>'
+        + '</div>'
+        + (title   ? '<div class="rc-title">' + title + '</div>' : '')
+        + product
+        + (body    ? '<p class="rc-body">' + body + '</p>' : '')
+        + '<div class="rc-date">' + date + '</div>'
+        + '</div>';
+    }).join('');
+  }
+
+  render();
+
+  // ── Filter buttons ──────────────────────────────────────
+  document.querySelectorAll('.rf-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.rf-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      _filter = this.dataset.sort;
+      render();
+    });
+  });
+</script>
+
+<!-- Testimonial submission popup -->
+<div id="testimonial-popup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card,#0A1829);border:1px solid var(--border,#112033);border-radius:4px;width:100%;max-width:500px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--red,#CC1126),transparent)"></div>
+    <div style="padding:22px 22px 0;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-family:var(--font-d);font-size:1.3rem;letter-spacing:.08em;color:var(--white,#EEF4FF)">Leave a Testimonial</div>
+      <button onclick="closeTestimonialPopup()" style="background:none;border:none;color:var(--ash,#6A8FAD);font-size:1.3rem;cursor:pointer;padding:4px 8px;line-height:1">✕</button>
+    </div>
+    <div style="padding:18px 22px 22px;display:flex;flex-direction:column;gap:12px">
+      <div id="tp-stars" style="display:flex;gap:4px">
+        <button class="tp-star" data-val="1" onclick="setTpStar(1)" style="background:none;border:none;cursor:pointer;font-size:1.6rem;color:var(--border,#112033);padding:0;transition:color .1s,transform .1s;line-height:1">★</button>
+        <button class="tp-star" data-val="2" onclick="setTpStar(2)" style="background:none;border:none;cursor:pointer;font-size:1.6rem;color:var(--border,#112033);padding:0;transition:color .1s,transform .1s;line-height:1">★</button>
+        <button class="tp-star" data-val="3" onclick="setTpStar(3)" style="background:none;border:none;cursor:pointer;font-size:1.6rem;color:var(--border,#112033);padding:0;transition:color .1s,transform .1s;line-height:1">★</button>
+        <button class="tp-star" data-val="4" onclick="setTpStar(4)" style="background:none;border:none;cursor:pointer;font-size:1.6rem;color:var(--border,#112033);padding:0;transition:color .1s,transform .1s;line-height:1">★</button>
+        <button class="tp-star" data-val="5" onclick="setTpStar(5)" style="background:none;border:none;cursor:pointer;font-size:1.6rem;color:var(--border,#112033);padding:0;transition:color .1s,transform .1s;line-height:1">★</button>
+      </div>
+      <input id="tp-title" type="text" maxlength="80" placeholder="Give your review a title…"
+        style="width:100%;background:var(--off,#07111F);border:1px solid var(--border,#112033);color:var(--white,#EEF4FF);font-family:var(--font-b);font-size:.88rem;padding:10px 12px;border-radius:3px;box-sizing:border-box;outline:none"/>
+      <textarea id="tp-body" maxlength="500" rows="4" placeholder="Share your experience with CTXLabz…"
+        style="width:100%;background:var(--off,#07111F);border:1px solid var(--border,#112033);color:var(--white,#EEF4FF);font-family:var(--font-b);font-size:.88rem;padding:10px 12px;border-radius:3px;box-sizing:border-box;resize:vertical;outline:none"></textarea>
+      <button onclick="submitTestimonialPopup()"
+        style="font-family:var(--font-c);font-size:.65rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;background:var(--red,#CC1126);color:#fff;border:none;padding:12px 24px;border-radius:3px;cursor:pointer;transition:opacity .15s;align-self:flex-start">
+        Submit Review
+      </button>
+      <div id="tp-msg" style="font-family:var(--font-c);font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;min-height:16px"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

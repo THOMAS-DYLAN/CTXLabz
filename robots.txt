@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /admin.html
+Disallow: /cart.html
+Disallow: /dashboard.html
+Disallow: /orders.html
+Disallow: /reset.html
+Disallow: /*?wc-ajax=*
+
+Sitemap: https://ctxlabz.com/sitemap.xml
