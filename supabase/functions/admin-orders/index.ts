@@ -120,8 +120,8 @@ serve(async (req) => {
       if (!filename || !imageBase64) return json({ error: "Missing filename or imageBase64" }, 400);
 
       const GITHUB_PAT  = Deno.env.get("GITHUB_PAT") ?? "";
-      const GITHUB_OWNER = "thomas-dylan";
-      const GITHUB_REPO  = "bigboypeps";
+      const GITHUB_OWNER = "THOMAS-DYLAN";
+      const GITHUB_REPO  = "CTXLabz";
       const GITHUB_PATH  = `pdct img/${filename.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
 
       const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "-");
