@@ -74,7 +74,7 @@ window.Auth = {
       email,
       password,
       options: {
-        data: { first_name: firstName, last_name: lastName, source: 'bbp' },
+        data: { first_name: firstName, last_name: lastName, source: 'ctxlabz' },
         emailRedirectTo: 'https://ctxlabz.com/dashboard.html',
       }
     });
@@ -232,7 +232,6 @@ window.Auth = {
       qty
     });
     return error ? { ok: false } : { ok: true };
-    return orderRow?.id || null;
   },
 
   async incrementInventory(productId, qty) {
@@ -286,9 +285,8 @@ window.Auth = {
       paypal_email:    order.paypal_email    || null,
       paypal_name:     order.paypal_name     || null,
       discount_code:   order.discount_code  || null,
-      discount_code:   order.discount_code  || null,
       discount_pct:    order.discount_pct   || null,
-      source_site:     order.source_site     || 'bbp',
+      source_site:     order.source_site     || 'ctxlabz',
     }).select('id').single();
 
     if (!order.skipInventory) {

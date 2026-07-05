@@ -1033,6 +1033,7 @@ async function finishOrder(shipping, paymentStatus, skipInventory) {
         shipping_state:   shipping.state || null,
         shipping_zip:     shipping.zip || null,
         payment_method:   paymentStatus === 'pending_cashapp' ? 'cashapp' : 'paypal',
+        source_site:      'ctxlabz',
       });
       if (orderId) orderIds.push(orderId);
     }
@@ -1053,7 +1054,7 @@ async function finishOrder(shipping, paymentStatus, skipInventory) {
     + '<div class="order-success-icon">✓</div>'
     + '<h2>Order Confirmed.</h2>'
     + '<p>Your order is confirmed and on its way.<br/>Handle with appropriate care and caution.</p>'
-    + '<a href="index.html" style="display:inline-block;margin-top:24px;font-family:var(--font-c);font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;background:var(--red);color:var(--white);padding:12px 28px;clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px))">Back to Dashboard</a>'
+    + '<a href="dashboard.html" style="display:inline-block;margin-top:24px;font-family:var(--font-c);font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;background:var(--red);color:var(--white);padding:12px 28px;clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px))">Back to Dashboard</a>'
     + '</div>';
 
   Cart.clear();
