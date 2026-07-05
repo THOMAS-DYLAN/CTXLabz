@@ -127,6 +127,42 @@ serve(async (req) => {
       const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "-");
 
       try {
+        // ── 0. Remove background via remove.bg API ─────────────
+        const REMOVE_BG_KEY = Deno.env.get("REMOVE_BG_KEY") ?? "";
+        let finalBase64 = imageBase64;
+        let finalBytes: Uint8Array;
+
+        if (REMOVE_BG_KEY) {
+          try {
+            const rbForm = new FormData();
+            rbForm.append("image_file_b64", imageBase64);
+            rbForm.append("size", "auto");
+            rbForm.append("type", "product");
+            const rbRes = await fetch("https://api.remove.bg/v1.0/removebg", {
+              method:  "POST",
+              headers: { "X-Api-Key": REMOVE_BG_KEY },
+              body:    rbForm,
+            });
+            if (rbRes.ok) {
+              const rbBuf = await rbRes.arrayBuffer();
+              finalBytes = new Uint8Array(rbBuf);
+              finalBase64 = btoa(String.fromCharCode(...finalBytes));
+              console.log("remove.bg: background removed successfully");
+            } else {
+              console.warn("remove.bg failed:", await rbRes.text());
+              const bin = atob(imageBase64); finalBytes = new Uint8Array(bin.length);
+              for (let i = 0; i < bin.length; i++) finalBytes[i] = bin.charCodeAt(i);
+            }
+          } catch (e) {
+            console.warn("remove.bg error:", String(e));
+            const bin = atob(imageBase64); finalBytes = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) finalBytes[i] = bin.charCodeAt(i);
+          }
+        } else {
+          const bin = atob(imageBase64); finalBytes = new Uint8Array(bin.length);
+          for (let i = 0; i < bin.length; i++) finalBytes[i] = bin.charCodeAt(i);
+        }
+
         // ── 1. Push to GitHub pdct img/ folder ─────────────────
         // Check if file already exists (need its SHA to update)
         let sha: string | undefined;
@@ -152,7 +188,7 @@ serve(async (req) => {
             },
             body: JSON.stringify({
               message: `Add product image: ${safeName}`,
-              content: imageBase64,  // GitHub API expects base64
+              content: finalBase64,
               branch:  "main",
               ...(sha ? { sha } : {}),
             }),
@@ -167,10 +203,7 @@ serve(async (req) => {
 
         // ── 2. Also keep a copy in Supabase Storage as backup ──
         try {
-          const binaryStr = atob(imageBase64);
-          const bytes = new Uint8Array(binaryStr.length);
-          for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
-          await sb.storage.from("product-images").upload(safeName, bytes, { contentType: "image/png", upsert: true });
+          await sb.storage.from("product-images").upload(safeName, finalBytes, { contentType: "image/png", upsert: true });
         } catch (_) { /* non-fatal if backup fails */ }
 
         // Return just the filename — shop will serve it from pdct img/ on GitHub Pages
