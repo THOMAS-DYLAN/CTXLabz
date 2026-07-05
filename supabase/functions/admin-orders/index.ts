@@ -83,12 +83,14 @@ serve(async (req) => {
     }
 
     if (action === "addProduct") {
-      const { name, category, price, bundle_price, inventory, potency, description, images } = body;
+      const { name, category, price, bundle_price, inventory, potency, description, images, publish_at } = body;
       if (!name || price === undefined) return json({ error: "Missing name or price" }, 400);
 
       const insertPayload = {
         name,
         category:     category ? category.trim() : "Peptides",
+        publish_at:   publish_at || null,
+        active:       publish_at ? new Date(publish_at) > new Date() ? false : true : true,
         price:        Number(price),
         bundle_price: bundle_price ? Number(bundle_price) : null,
         inventory:    Number(inventory) || 0,

@@ -781,6 +781,10 @@
               <div class="ap-label">Description</div>
               <textarea class="ap-textarea" id="ap-desc" placeholder="Research compound description…"></textarea>
             </div>
+            <div class="ap-field" style="margin-top:4px">
+              <div class="ap-label">Schedule Publish Date <span style="font-weight:400;opacity:.5">(optional — leave blank to publish now)</span></div>
+              <input class="ap-input" id="ap-publish-at" type="datetime-local" />
+            </div>
             <button class="ap-submit" id="ap-submit" onclick="submitProduct()">Add Product</button>
             <div class="ap-msg" id="ap-msg"></div>
           </div>
@@ -1233,7 +1237,7 @@
     document.getElementById('tab-' + tab).classList.add('active');
     if (btn) btn.classList.add('active');
     _activeTab = tab;
-    if (tab === 'products' && !_productsLoaded) loadProductsTab();
+    if (tab === 'products') { _productsLoaded = false; loadProductsTab(); }
     if (tab === 'deals'    && !_dealsLoaded)    loadDealsTab();
   };
 
@@ -1504,6 +1508,9 @@
         sel.innerHTML = '<option value="">— Select —</option>'
           + loaded.map(function(c){ return '<option value="'+c+'">'+c+'</option>'; }).join('')
             + '<option value="__new__">+ New category…</option>';
+        // Also refresh products table if it's already rendered
+        var tbl = document.getElementById('products-table');
+        if (tbl && tbl.style.display !== 'none') renderProductsTable();
       });
     }
   }
@@ -1594,6 +1601,7 @@
       var addRes = await fetch(ADMIN_URL, { method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ password:_pw, action:'addProduct',
           name:name, category:category, price:price,
+          publish_at: document.getElementById('ap-publish-at')?.value || null,
           bundle_price: bundle ? parseFloat(bundle) : null,
           inventory:inventory, potency:_apPotency,
           description:desc, images:imageFilename })
@@ -1614,6 +1622,7 @@
       var el=document.getElementById(id); if(el) el.value='';
     });
     var sel=document.getElementById('ap-category'); if(sel) sel.value='';
+    var pa=document.getElementById('ap-publish-at'); if(pa) pa.value='';
     var msg=document.getElementById('ap-msg'); if(msg) msg.textContent='';
     var dz=document.getElementById('img-dropzone'); if(dz) dz.style.display='';
     var pw=document.getElementById('img-preview-wrap'); if(pw) pw.style.display='none';

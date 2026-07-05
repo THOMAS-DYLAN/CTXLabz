@@ -915,7 +915,8 @@ window.payCashApp = async function() {
 // ── Order notification (shared by finishOrder + test button) ──
 async function sendOrderNotification(items, shipping, profile, paymentStatus, confirmToken) {
   paymentStatus = paymentStatus || 'paid';
-  var isPending = paymentStatus === 'pending_cashapp';
+  var isPending = ['pending_cashapp','pending_zelle','pending_bitcoin'].indexOf(paymentStatus) !== -1;
+  var payLabel   = paymentStatus === 'pending_cashapp' ? 'Cash App' : paymentStatus === 'pending_zelle' ? 'Zelle' : paymentStatus === 'pending_bitcoin' ? 'Bitcoin' : 'PayPal';
   var confirmUrl = 'https://utqviljholfvpfztfuvx.supabase.co/functions/v1/confirm-order?token=' + (confirmToken || '');
   var discount   = _appliedDiscount;
   var subtotal   = items.reduce(function(s,i) { return s + i.price * i.qty; }, 0);
@@ -932,12 +933,13 @@ async function sendOrderNotification(items, shipping, profile, paymentStatus, co
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
     body: JSON.stringify({
       access_key:  '8eec27a9-6e50-4206-a71a-a2c6f0c4c8bb',
-      subject:     isPending ? '⚠ CASH APP ORDER — AWAITING VERIFICATION' : '✅ New Order — CTXLabz',
+      to:          'Brandon.burnell@hotmail.com',
+      subject:     isPending ? '⚠ ' + payLabel.toUpperCase() + ' ORDER — AWAITING VERIFICATION' : '✅ New Order — CTXLabz',
       from_name:   'CTXLabz Store',
       name:        (shipping.first_name || '') + ' ' + (shipping.last_name || ''),
       email:       profile?.email || 'unknown',
       message:
-        '=== NEW ORDER ===\n' + (isPending ? '⚠ PAYMENT UNVERIFIED — Cash App. Verify $' + orderTotal.toFixed(2) + ' received at ' + CASHAPP_USERNAME + ' before shipping.\n' : '') + '\n' +
+        '=== NEW ORDER ===\n' + (isPending ? '⚠ PAYMENT UNVERIFIED — ' + payLabel + '. Verify $' + orderTotal.toFixed(2) + ' received before shipping.\n' : '') + '\n' +
         'CUSTOMER\n' +
         'Name: '  + (shipping.first_name || '') + ' ' + (shipping.last_name || '') + '\n' +
         'Email: ' + (profile?.email || 'unknown') + '\n' +
@@ -956,6 +958,8 @@ async function sendOrderNotification(items, shipping, profile, paymentStatus, co
         'Subtotal: $' + subtotal.toFixed(2) + '\n' +
         (shipping.paypal_email ? 'PayPal: ' + shipping.paypal_name + ' (' + shipping.paypal_email + ')\n' : '') +
         (shipping.cashapp_cashtag ? 'Customer $Cashtag: ' + shipping.cashapp_cashtag + '\n' : '') +
+        (paymentStatus === 'pending_zelle' ? 'Payment Method: Zelle\n' : '') +
+        (paymentStatus === 'pending_bitcoin' ? 'Payment Method: Bitcoin\n' : '') +
         (discount ? 'Discount (' + discount.code + ' ' + discount.pct + '%): -$' + discountAmt.toFixed(2) + '\n' : '') +
         'Shipping: $' + Number(shipPrice).toFixed(2) + '\n' +
         'TOTAL: $'    + orderTotal.toFixed(2) + '\n\n' +
@@ -1033,7 +1037,6 @@ async function finishOrder(shipping, paymentStatus, skipInventory) {
         shipping_state:   shipping.state || null,
         shipping_zip:     shipping.zip || null,
         payment_method:   paymentStatus === 'pending_cashapp' ? 'cashapp' : 'paypal',
-        source_site:      'ctxlabz',
       });
       if (orderId) orderIds.push(orderId);
     }
@@ -1054,7 +1057,7 @@ async function finishOrder(shipping, paymentStatus, skipInventory) {
     + '<div class="order-success-icon">✓</div>'
     + '<h2>Order Confirmed.</h2>'
     + '<p>Your order is confirmed and on its way.<br/>Handle with appropriate care and caution.</p>'
-    + '<a href="dashboard.html" style="display:inline-block;margin-top:24px;font-family:var(--font-c);font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;background:var(--red);color:var(--white);padding:12px 28px;clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px))">Back to Dashboard</a>'
+    + '<a href="index.html" style="display:inline-block;margin-top:24px;font-family:var(--font-c);font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;background:var(--red);color:var(--white);padding:12px 28px;clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px))">Back to Dashboard</a>'
     + '</div>';
 
   Cart.clear();
