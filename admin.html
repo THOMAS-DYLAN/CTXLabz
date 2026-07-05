@@ -1637,8 +1637,7 @@
         var canvas = document.createElement('canvas');
         canvas.width = 500; canvas.height = 500;
         var ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, 500, 500);
+        ctx.clearRect(0, 0, 500, 500);
         // Scale to fit within 500x500 maintaining aspect ratio
         var scale = Math.min(400 / img.width, 400 / img.height);
         var sw = Math.round(img.width * scale);
