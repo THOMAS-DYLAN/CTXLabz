@@ -33,7 +33,7 @@ const BRANDS: Record<string, {
     name:        "CTXLabz",
     from:        "noreply@ctxlabz.com",
     shopUrl:     "https://ctxlabz.com/shop.html",
-    unsubBase:   "https://ctxlabz.com/supabase/functions/v1/unsubscribe",
+    unsubBase:   "https://utqviljholfvpfztfuvx.supabase.co/functions/v1/unsubscribe",
     headerBg:    "#1A4FA0",
     accentBg:    "#CC1126",
   },
@@ -42,8 +42,8 @@ const BRANDS: Record<string, {
     from:        "noreply@ctxlabz.com",
     shopUrl:     "https://956labs.ctxlabz.com/index.html",
     unsubBase:   "https://utqviljholfvpfztfuvx.supabase.co/functions/v1/unsubscribe",
-    headerBg:    "#1A4FA0",
-    accentBg:    "#CC1126",
+    headerBg:    "#006847",
+    accentBg:    "#CE1126",
   },
 };
 

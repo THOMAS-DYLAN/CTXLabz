@@ -9,6 +9,7 @@
   <link rel="icon" type="image/png" href="favicon.png"/>
   <link rel="apple-touch-icon" href="img/apple-touch-icon.png"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="canonical" href="https://ctxlabz.com/testimonials.html" />
   <title>Customer Reviews — CTXLabz</title>
   <meta name="description" content="See what verified researchers say about CTXLabz. Real reviews from real customers." />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -200,7 +201,7 @@
     .rc-date {
       font-family:var(--font-c); font-size:.52rem;
       letter-spacing:.1em; text-transform:uppercase;
-      color:var(--border,#112033); margin-top:4px;
+      color:var(--ash,#6A8FAD); margin-top:4px;
     }
 
     /* Empty/loading state */
@@ -373,14 +374,68 @@
   render();
 
   // ── Filter buttons ──────────────────────────────────────
-  document.querySelectorAll('.rf-btn').forEach(btn => {
+  document.querySelectorAll('.rf-btn[data-sort]').forEach(btn => {
     btn.addEventListener('click', function() {
-      document.querySelectorAll('.rf-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.rf-btn[data-sort]').forEach(b => b.classList.remove('active'));
       this.classList.add('active');
       _filter = this.dataset.sort;
       render();
     });
   });
+
+  // ── Testimonial popup ───────────────────────────────────
+  var _tpRating = 0;
+
+  window.openTestimonialPopup = function() {
+    const popup = document.getElementById('testimonial-popup');
+    popup.style.display = 'flex';
+    _tpRating = 0;
+    document.querySelectorAll('.tp-star').forEach(s => s.style.color = 'var(--border,#112033)');
+    const ti = document.getElementById('tp-title'); if (ti) ti.value = '';
+    const tb = document.getElementById('tp-body');  if (tb) tb.value = '';
+    const tm = document.getElementById('tp-msg');   if (tm) { tm.textContent = ''; tm.style.color = ''; }
+  };
+
+  window.closeTestimonialPopup = function() {
+    document.getElementById('testimonial-popup').style.display = 'none';
+  };
+
+  document.getElementById('testimonial-popup').addEventListener('click', function(e) {
+    if (e.target === this) window.closeTestimonialPopup();
+  });
+
+  if (new URLSearchParams(window.location.search).get('write') === '1') openTestimonialPopup();
+
+  window.setTpStar = function(n) {
+    _tpRating = n;
+    document.querySelectorAll('.tp-star').forEach(s => {
+      s.style.color = parseInt(s.dataset.val) <= n ? 'var(--red,#CC1126)' : 'var(--border,#112033)';
+    });
+  };
+
+  window.submitTestimonialPopup = async function() {
+    const title = (document.getElementById('tp-title')?.value || '').trim();
+    const body  = (document.getElementById('tp-body')?.value  || '').trim();
+    const msg   = document.getElementById('tp-msg');
+    msg.textContent = ''; msg.style.color = '';
+    if (!_tpRating) { msg.style.color = 'var(--red,#CC1126)'; msg.textContent = 'Please select a rating.'; return; }
+    if (!title)     { msg.style.color = 'var(--red,#CC1126)'; msg.textContent = 'Please add a title.'; return; }
+    if (!body)      { msg.style.color = 'var(--red,#CC1126)'; msg.textContent = 'Please write something.'; return; }
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { msg.style.color = 'var(--red,#CC1126)'; msg.textContent = 'You must be logged in.'; return; }
+    const { data: profile } = await supabase.from('profiles').select('first_name').eq('id', session.user.id).single();
+    const displayName = profile?.first_name || session.user.email?.split('@')[0] || 'Verified Researcher';
+    const { error } = await supabase.from('testimonials').insert({
+      user_id: session.user.id, display_name: displayName,
+      title, body, rating: _tpRating, approved: true,
+    });
+    if (error) {
+      msg.style.color = 'var(--red,#CC1126)'; msg.textContent = error.message || 'Something went wrong.';
+    } else {
+      msg.style.color = 'var(--ash,#6A8FAD)'; msg.textContent = '✓ Review submitted! Thank you.';
+      setTimeout(() => { window.closeTestimonialPopup(); location.reload(); }, 2000);
+    }
+  };
 </script>
 
 <!-- Testimonial submission popup -->

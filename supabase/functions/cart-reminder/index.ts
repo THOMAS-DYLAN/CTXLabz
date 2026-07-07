@@ -92,8 +92,8 @@ serve(async (req) => {
 <body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,sans-serif">
 <div style="max-width:600px;margin:0 auto;background:#fff">
 
-  <div style="background:#111;padding:24px 32px;display:flex;align-items:center;gap:12px">
-    <span style="font-family:'Bebas Neue',Arial,sans-serif;font-size:1.8rem;letter-spacing:.08em;color:#fff">Big<span style="color:#CC1126">Boy</span>Peps</span>
+  <div style="background:#1A4FA0;padding:24px 32px;display:flex;align-items:center;gap:12px">
+    <span style="font-family:'Bebas Neue',Arial,sans-serif;font-size:1.8rem;letter-spacing:.08em;color:#fff">CTXLabz</span>
   </div>
 
   <div style="padding:32px">
@@ -142,7 +142,7 @@ serve(async (req) => {
   <div style="background:#f6f6f6;padding:16px 32px;text-align:center;border-top:1px solid #eeeeee">
     <p style="margin:0;font-size:11px;color:#999999;line-height:1.6">
       For research purposes only &middot; Not for human consumption<br>
-      <a href="https://ctxlabz.com/index.html?unsubscribe=${row.user_id}" style="color:#bbbbbb;text-decoration:underline">Unsubscribe</a>
+      <a href="https://utqviljholfvpfztfuvx.supabase.co/functions/v1/unsubscribe?uid=${row.user_id}" style="color:#bbbbbb;text-decoration:underline">Unsubscribe</a>
     </p>
   </div>
 
@@ -171,14 +171,14 @@ serve(async (req) => {
       if (res.ok) {
         // Update reminder count and timestamp
         if (row.id !== "test") {
-        await sb
-          .from("cart_reminders")
-          .update({
-            last_reminder:  now.toISOString(),
-            reminder_count: count + 1,
-          })
-          .eq("id", row.id);
-      }
+          await sb
+            .from("cart_reminders")
+            .update({
+              last_reminder:  now.toISOString(),
+              reminder_count: count + 1,
+            })
+            .eq("id", row.id);
+        }
         sent++;
       } else {
         console.error("Resend failed:", await res.text());

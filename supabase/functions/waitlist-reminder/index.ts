@@ -54,7 +54,7 @@ serve(async (req) => {
     // Get all notified waitlist entries where product is still in stock
     const { data: entries, error } = await sb
       .from("waitlist")
-      .select("*, products(name, inventory, price)")
+      .select("*, products!inner(name, inventory, price)")
       .eq("notified", true)
       .gt("products.inventory", 0);
 
@@ -146,8 +146,8 @@ async function sendWaitlistReminder(sb: any, entry: {
 <body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,sans-serif">
 <div style="max-width:600px;margin:0 auto;background:#fff">
 
-  <div style="background:#111;padding:24px 32px">
-    <span style="font-family:'Bebas Neue',Arial,sans-serif;font-size:1.8rem;letter-spacing:.08em;color:#fff">Big<span style="color:#CC1126">Boy</span>Peps</span>
+  <div style="background:#1A4FA0;padding:24px 32px">
+    <span style="font-family:'Bebas Neue',Arial,sans-serif;font-size:1.8rem;letter-spacing:.08em;color:#fff">CTXLabz</span>
   </div>
 
   <div style="padding:32px">
