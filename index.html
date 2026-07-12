@@ -385,11 +385,9 @@
     }
 
     function thumbHTML(p) {
-      if (p.images) {
-        var _src = p.images.startsWith('http') ? p.images : 'pdct img/' + p.images;
-        return '<img src="' + _src + '" alt="' + p.name + '" width="160" height="160" style="width:auto;height:160px;object-fit:contain;object-position:center;position:relative;z-index:1;display:block;margin:auto" loading="lazy" decoding="async">';
-      }
-      return pepperSVG(p);
+      return '<img src="pdct img/product_01.png" alt="CTXLabz Product" style="width:auto;height:160px;object-fit:contain;object-position:center;display:block;margin:auto" loading="lazy"/>';
+    }
+      return '<img src="pdct img/product_01.png" alt="CTXLabz Product" style="width:auto;height:160px;object-fit:contain;object-position:center;display:block;margin:auto" loading="lazy"/>';
     }
 
     function thumbBg(p) { return '#F0F0F0'; }
